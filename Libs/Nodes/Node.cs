@@ -1,0 +1,455 @@
+﻿/*  MyNodes.NET 
+    Copyright (C) 2016 Derwish <derwish.pro@gmail.com>
+    License: http://www.gnu.org/licenses/gpl-3.0.txt  
+*/
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace MyNodes.Nodes
+{
+    public delegate void NodeEventHandler(Node node);
+    public delegate void NodeUpdateEventHandler(Node node, bool writeNodeToDb);
+
+    public enum DataType
+    {
+        Text,
+        Number,
+        Logical
+    }
+
+    public abstract class Node
+    {
+        public const string DefaultInputName = "In";
+        public const string DefaultOutputName = "Out";
+
+        public string Id { get; set; }
+        public string PanelId { get; set; }
+        public string Category { get; set; }
+        public string Type { get; set; }
+        public Position Position { get; set; }
+        public Size Size { get; set; }
+        //        public string flags { get; set; }
+        public List<Input> Inputs { get; set; }
+        public List<Output> Outputs { get; set; }
+
+        protected NodesEngine engine;
+
+        protected NodeOptions options = new NodeOptions();
+
+        public Dictionary<string, NodeSetting> Settings { get; set; }
+
+        public string PanelName
+        {
+            get
+            {
+                if (PanelId == engine?.MAIN_PANEL_ID)
+                {
+                    return "Main Panel";
+                }
+
+                return engine?.GetPanelNode(PanelId)?.Settings["Name"].Value;
+            }
+        }
+
+        public Node(string category, string type)
+        {
+            Id = Guid.NewGuid().ToString();
+
+            Type = type;
+            Category = category;
+
+            Outputs = new List<Output>();
+            Inputs = new List<Input>();
+            Settings = new Dictionary<string, NodeSetting>();
+
+            PanelId = "Main";
+        }
+
+        public void LogInfo(string message)
+        {
+            engine?.LogNodesInfo($"{PanelName}: {Type}: {message}");
+        }
+
+        public void LogError(string message)
+        {
+            engine?.LogNodesError($"{PanelName}: {Type}: {message}");
+        }
+
+        public void LogIncorrectInputValueError(Input input)
+        {
+            LogError($"Incorrect value in [{input.Name}]: [{input.Value}]");
+        }
+
+        public virtual void Loop() { }
+        public virtual void OnInputChange(Input input) { }
+
+        public virtual void OnOutputChange(Output output)
+        {
+            if (options.LogOutputChanges)
+            {
+                LogInfo($"{output.Name}: [{output.Value ?? "NULL"}]");
+            }
+
+            //send state to linked nodes
+            List<Link> list = engine?.GetLinksForOutput(output);
+            foreach (var link in list)
+            {
+                Input input = engine?.GetInput(link.InputId);
+                if (input != null)
+                {
+                    input.Value = output.Value;
+                }
+            }
+        }
+
+        public virtual void OnRemove()
+        {
+            foreach (var input in Inputs)
+            {
+                input.OnInputChange -= engine.OnInputChange;
+            }
+
+            foreach (var output in Outputs)
+            {
+                output.OnOutputChange -= engine.OnOutputChange;
+            }
+
+            engine = null;
+        }
+
+        public virtual bool OnAddToEngine(NodesEngine engine)
+        {
+            this.engine = engine;
+
+            foreach (var input in Inputs)
+            {
+                input.OnInputChange += engine.OnInputChange;
+            }
+
+            foreach (var output in Outputs)
+            {
+                output.OnOutputChange += engine.OnOutputChange;
+            }
+
+            return true;
+        }
+
+        public void UpdateMeOnDashboard()
+        {
+            engine?.UpdateNodeOnDashboard(this);
+        }
+
+        public void UpdateMeInEditor()
+        {
+            engine?.UpdateNodeInEditor(this);
+        }
+
+        public void UpdateMeInDb()
+        {
+            engine?.UpdateNodeInDb(this);
+        }
+
+
+        public void AddInput(Input input)
+        {
+            AddWithOrder(Inputs, input, p => p.SlotIndex);
+
+            if (engine != null)
+            {
+                input.OnInputChange += engine.OnInputChange;
+            }
+        }
+
+        public void AddOutput(Output output)
+        {
+            AddWithOrder(Outputs, output, p => p.SlotIndex);
+
+            if (engine != null)
+            {
+                output.OnOutputChange += engine.OnOutputChange;
+            }
+        }
+
+        public void AddInput(string name, DataType type = DataType.Text, bool isOptional = false)
+        {
+            if (name == null)
+            {
+                name = !Inputs.Any() ? DefaultInputName : $"{DefaultInputName} {(Inputs.Count + 1)}";
+                if (Inputs.Count == 1 && Inputs[0].Name == DefaultInputName)
+                {
+                    Inputs[0].Name = $"{DefaultInputName} 1";
+                }
+            }
+            AddInput(new Input(name, type, isOptional));
+        }
+
+        public void AddOutput(string name, DataType type = DataType.Text)
+        {
+            if (name == null)
+            {
+                name = !Outputs.Any() ? DefaultOutputName : $"{DefaultOutputName} {(Outputs.Count + 1)}";
+                if (Outputs.Count == 1 && Outputs[0].Name == DefaultOutputName)
+                {
+                    Outputs[0].Name = $"{DefaultOutputName} 1";
+                }
+            }
+            AddOutput(new Output(name, type));
+        }
+
+        public void AddInput(DataType type = DataType.Text, bool isOptional = false)
+        {
+            AddInput(null, type, isOptional);
+        }
+
+        public void AddOutput(DataType type = DataType.Text)
+        {
+            AddOutput(null, type);
+        }
+
+        public void RemoveInput(Input input)
+        {
+            if (input == null || !Inputs.Contains(input))
+            {
+                LogError("Can`t remove input. Does not exist.");
+                return;
+            }
+
+            var link = engine.GetLinkForInput(input);
+            if (link != null)
+            {
+                engine.RemoveLink(link, true);
+            }
+
+            Inputs.Remove(input);
+        }
+
+        public void RemoveOutput(Output output)
+        {
+            if (output == null || !Outputs.Contains(output))
+            {
+                LogError("Can`t remove output. Does not exist.");
+                return;
+            }
+
+            var links = engine.GetLinksForOutput(output);
+
+            engine.RemoveLinks(links,true);
+
+
+            Outputs.Remove(output);
+        }
+
+        public void RemoveOutput(string name)
+        {
+            Output output = Outputs.FirstOrDefault(x => x.Name == name);
+            RemoveOutput(output);
+        }
+
+        public void RemoveInput(string name)
+        {
+            Input input = Inputs.FirstOrDefault(x => x.Name == name);
+            RemoveInput(input);
+        }
+
+        public Output GetOutput(string name)
+        {
+            Output output = Outputs.FirstOrDefault(x => x.Name == name);
+            return output;
+        }
+
+        public Input GetInput(string name)
+        {
+            Input input = Inputs.FirstOrDefault(x => x.Name == name);
+            return input;
+        }
+
+        public void ShowActivity()
+        {
+            engine.ShowNodeActivity(this);
+        }
+
+        public void ResetInputs()
+        {
+            foreach (var input in Inputs)
+            {
+                input.Value = null;
+            }
+        }
+
+        public void ResetOutputs()
+        {
+            foreach (var output in Outputs)
+            {
+                if (output.Value != null)
+                {
+                    output.Value = null;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Sets the value of the output with the specified name.
+        /// </summary>
+        /// <param name="skipIfEqual">Don't set output value if the current value is the same.</param>
+        public void SetOutputValue<T>(string outputName, T value, bool skipIfEqual = false)
+        {
+            var valueAsString = value.ToString();
+            var output = GetOutput(outputName);
+            if (output == null)
+            {
+                return;
+            }
+            if (skipIfEqual && output.Value == valueAsString)
+            {
+                return;
+            }
+            output.Value = valueAsString;
+        }
+
+        public virtual void CheckInputDataTypeIsCorrect(Input input)
+        {
+            if (input.Value == null)
+            {
+                return;
+            }
+
+            if (input.Type == DataType.Text)
+            {
+                return;
+            }
+
+            if (input.Type == DataType.Logical)
+            {
+                if (input.Value != null && input.Value != "0" && input.Value != "1")
+                {
+                    LogIncorrectInputValueError(input);
+                    input.SetValueWithoutUpdate(null);
+                }
+            }
+
+            if (input.Type == DataType.Number)
+            {
+                double num;
+
+                if (!double.TryParse(input.Value, out num))
+                {
+                    LogIncorrectInputValueError(input);
+                    input.SetValueWithoutUpdate(null);
+                }
+            }
+        }
+
+        public virtual bool SetSettings(Dictionary<string, string> data)
+        {
+            foreach (var d in data)
+            {
+                Settings[d.Key].Value = d.Value;
+            }
+
+            UpdateMeInEditor();
+            UpdateMeInDb();
+
+
+            LogInfo($"Settings changed");
+
+            return true;
+        }
+
+        public virtual string GetJsListGenerationScript()
+        {
+            var t = this.GetType();
+            string className = this.GetType().Name;
+            string fullClassName = this.GetType().FullName;
+            string assembly = this.GetType().Assembly.ToString();
+            return @"
+
+            //" + className + @"
+            function " + className + @" () {
+                this.properties = {
+                    'ObjectType': '" + fullClassName + @"',
+                    'Assembly': '" + assembly + @"'
+                };
+            }
+            " + className + @".title = '" + this.Type + @"';
+            LiteGraph.registerNodeType('" + this.Category + "/" + this.Type + "', " + className + @");
+
+            ";
+        }
+
+        public virtual string GetNodeDescription()
+        {
+            return "This node does not have a description.";
+        }
+
+        public NodeOptions GetNodeOptions()
+        {
+            return options;
+        }
+
+        public void AddNodeData(string data, int? maxDbRecords = null)
+        {
+            engine?.dataDb?.AddNodeData(new NodeData(Id, data), maxDbRecords);
+        }
+
+        public int AddNodeDataImmediately(string data, int? maxDbRecords = null)
+        {
+            if (engine == null)
+                return -1;
+
+            return engine.dataDb.AddNodeDataImmediately(new NodeData(Id, data), maxDbRecords);
+        }
+
+        public void UpdateNodeData(NodeData nodeData)
+        {
+            engine?.dataDb?.UpdateNodeData(nodeData);
+        }
+
+        public void UpdateNodeDataImmediately(NodeData nodeData)
+        {
+            engine?.dataDb?.UpdateNodeDataImmediately(nodeData);
+        }
+
+        public List<NodeData> GetAllNodeData()
+        {
+            return engine?
+                .dataDb?
+                .GetAllNodeDataForNode(Id)?
+                .OrderBy(x=>x.DateTime)
+                .ToList();
+        }
+
+        public NodeData GetNodeData(int id)
+        {
+            return engine?.dataDb?.GetNodeData(id);
+        }
+
+        public void RemoveAllNodeData()
+        {
+            engine?.dataDb?.RemoveAllNodeDataForNode(Id);
+        }
+
+        public void RemoveNodeData(int id)
+        {
+            engine?.dataDb?.RemoveNodeData(id);
+        }
+
+        /// <summary>
+        /// Adds an item to the specified <see cref="List{T}"/> and maintain the order by
+        /// comparing the key returned by the <paramref name="key"/> (insertion sort).
+        /// </summary>
+        private static void AddWithOrder<T>(List<T> list, T item, Func<T, IComparable> key)
+        {
+            var index = list.FindIndex(p => key(p).CompareTo(key(item)) > 0);
+            if (index >= 0)
+            {
+                list.Insert(index, item);
+            }
+            else
+            {
+                list.Add(item);
+            }
+        }
+    }
+}

@@ -1,0 +1,168 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{D01DC889-34D8-41DB-A0E9-81BFB1FA1E1E}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>MyNodes.Nodes</RootNamespace>
+    <AssemblyName>Nodes</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Newtonsoft.Json.8.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Net.Http" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="INodesRepository.cs" />
+    <Compile Include="INodesDataRepository.cs" />
+    <Compile Include="Input.cs" />
+    <Compile Include="LiteGraph.cs" />
+    <Compile Include="Node.cs" />
+    <Compile Include="NodeOptions.cs" />
+    <Compile Include="NodesEngineSerializer.cs" />
+    <Compile Include="NodeSetting.cs" />
+    <Compile Include="Nodes\FiltersOnlyFromRangeNode.cs" />
+    <Compile Include="Nodes\FiltersOnlyLowerNode.cs" />
+    <Compile Include="Nodes\FiltersPreventDuplicationNode.cs" />
+    <Compile Include="Nodes\FiltersOnlySpecifiedNode.cs" />
+    <Compile Include="Nodes\FiltersReduceEventsNode.cs" />
+    <Compile Include="Nodes\FiltersPreventSpecifiedNode.cs" />
+    <Compile Include="Nodes\FiltersPreventNullNode.cs" />
+    <Compile Include="Nodes\FiltersOnlyLogicNode.cs" />
+    <Compile Include="Nodes\FiltersOnlyNumbersNode.cs" />
+    <Compile Include="Nodes\FiltersOnlyZeroNode.cs" />
+    <Compile Include="Nodes\FiltersOnlyOneNode.cs" />
+    <Compile Include="Nodes\ConnectionRemoteReceiverNode.cs" />
+    <Compile Include="Nodes\ConnectionLocalReceiverNode.cs" />
+    <Compile Include="Nodes\ConnectionRemoteTransmitterNode.cs" />
+    <Compile Include="Nodes\ConnectionLocalTransmitterNode.cs" />
+    <Compile Include="Nodes\BasicConstantNode.cs" />
+    <Compile Include="Nodes\ConnectionHubNode.cs" />
+    <Compile Include="Nodes\LogicCheckInRangeNode.cs" />
+    <Compile Include="Nodes\MathAverageNode.cs" />
+    <Compile Include="Nodes\MathMaxNode.cs" />
+    <Compile Include="Nodes\MathMinNode.cs" />
+    <Compile Include="Nodes\OperationEventCounterNode.cs" />
+    <Compile Include="Nodes\RgbCrossfadeRgbNode.cs" />
+    <Compile Include="Nodes\RgbCrossfadeRgbwNode.cs" />
+    <Compile Include="Nodes\RgbFadeRgbNode.cs" />
+    <Compile Include="Nodes\RgbSmoothRgbwNode.cs" />
+    <Compile Include="Nodes\RgbSmoothRgbNode.cs" />
+    <Compile Include="Nodes\RgbRandomRgbNode.cs" />
+    <Compile Include="Nodes\RgbRandomRgbwNode.cs" />
+    <Compile Include="Nodes\OperationStackNode.cs" />
+    <Compile Include="Nodes\OperationQueueNode.cs" />
+    <Compile Include="Nodes\OperationLinearShaperNode.cs" />
+    <Compile Include="Nodes\LogicAndNode.cs" />
+    <Compile Include="Nodes\LogicNotNode.cs" />
+    <Compile Include="Nodes\LogicOrNode.cs" />
+    <Compile Include="Nodes\MathCosNode.cs" />
+    <Compile Include="Nodes\MathDivideNode.cs" />
+    <Compile Include="Nodes\OperationFreqDividerNode.cs" />
+    <Compile Include="Nodes\ConnectionRouterMultipleToOneNode.cs" />
+    <Compile Include="Nodes\ConnectionRouterOneToMultipleNode.cs" />
+    <Compile Include="Nodes\RgbRgbwRemapNode.cs" />
+    <Compile Include="Nodes\RgbRgbRemapNode.cs" />
+    <Compile Include="Nodes\RgbNumbersToRgbwNode.cs" />
+    <Compile Include="Nodes\RgbNumbersToRgbNode.cs" />
+    <Compile Include="Nodes\RgbRgbwToNumbersNode.cs" />
+    <Compile Include="Nodes\RgbRgbToNumbersNode.cs" />
+    <Compile Include="Nodes\FiltersOnlyGreaterNode.cs" />
+    <Compile Include="Nodes\SystemRunNode.cs" />
+    <Compile Include="Nodes\MathSumNode.cs" />
+    <Compile Include="Nodes\SystemJsonFileNode.cs" />
+    <Compile Include="Nodes\SystemFileNode.cs" />
+    <Compile Include="Nodes\TextCutSubstringNode.cs" />
+    <Compile Include="Nodes\TextStringLengthNode.cs" />
+    <Compile Include="Nodes\TextCharAtIndexNode.cs" />
+    <Compile Include="Nodes\TextSplitStringsNode.cs" />
+    <Compile Include="Nodes\TextASCIICharNode.cs" />
+    <Compile Include="Nodes\TextASCIICodeNode.cs" />
+    <Compile Include="Nodes\TimeDelayMeterNode.cs" />
+    <Compile Include="Nodes\TimeClockNode.cs" />
+    <Compile Include="Nodes\RgbFadeRgbwNode.cs" />
+    <Compile Include="Nodes\TimeSmoothByRangeNode.cs" />
+    <Compile Include="Nodes\TimeFadeNode.cs" />
+    <Compile Include="Nodes\TimeSmoothByTimeNode.cs" />
+    <Compile Include="Nodes\TimeFrequencyMeterNode.cs" />
+    <Compile Include="Nodes\OperationCrossfadeNode.cs" />
+    <Compile Include="Nodes\MathMinusNode.cs" />
+    <Compile Include="Nodes\MathModulusNode.cs" />
+    <Compile Include="Nodes\MathMultiplyNode.cs" />
+    <Compile Include="Nodes\MathClampNode.cs" />
+    <Compile Include="Nodes\MathRemapNode.cs" />
+    <Compile Include="Nodes\MathPowNode.cs" />
+    <Compile Include="Nodes\TimeDelayNode.cs" />
+    <Compile Include="Nodes\TimeIntervalTimerNode.cs" />
+    <Compile Include="Nodes\TimeIteratorNode.cs" />
+    <Compile Include="Nodes\TimeTickerNode.cs" />
+    <Compile Include="Nodes\TextConcatenationNode.cs" />
+    <Compile Include="Nodes\OperationAnyToOneNode.cs" />
+    <Compile Include="Nodes\MathRoundNode.cs" />
+    <Compile Include="Nodes\MathSinNode.cs" />
+    <Compile Include="Nodes\MathSqrtNode.cs" />
+    <Compile Include="Nodes\MathTanNode.cs" />
+    <Compile Include="Nodes\LogicCompareEqualNode.cs" />
+    <Compile Include="Nodes\LogicCompareGreaterNode.cs" />
+    <Compile Include="Nodes\LogicCompareLowerNode.cs" />
+    <Compile Include="Nodes\LogicCompareNotEqualNode.cs" />
+    <Compile Include="Nodes\OperationFlipflopNode.cs" />
+    <Compile Include="Nodes\ConnectionGateNode.cs" />
+    <Compile Include="Nodes\OperationRandomNode.cs" />
+    <Compile Include="Nodes\PanelOutputNode.cs" />
+    <Compile Include="Nodes\PanelInputNode.cs" />
+    <Compile Include="Nodes\PanelNode.cs" />
+    <Compile Include="Nodes\OperationCounterNode.cs" />
+    <Compile Include="Nodes\MathPlusNode.cs" />
+    <Compile Include="NodesEngine.cs" />
+    <Compile Include="Link.cs" />
+    <Compile Include="NodeData.cs" />
+    <Compile Include="Nodes\UtilityBeepNode.cs" />
+    <Compile Include="Output.cs" />
+    <Compile Include="Position.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SerializedNode.cs" />
+    <Compile Include="Size.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Custom\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
