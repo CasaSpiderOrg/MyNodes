@@ -85,7 +85,7 @@
 //#define MY_IP_SUBNET_ADDRESS 255,255,255,0
 
 // Renewal period if using DHCP
-#define MY_IP_RENEWAL_INTERVAL 60000
+//#define MY_IP_RENEWAL_INTERVAL 60000
 
 // The port to keep open on node server mode / or port to contact in client mode
 #define MY_PORT 5003
@@ -97,7 +97,7 @@
 // The MAC address can be anything you want but should be unique on your network.
 // Newer boards have a MAC address printed on the underside of the PCB, which you can (optionally) use.
 // Note that most of the Arduino examples use  "DEAD BEEF FEED" for the MAC address.
-#define MY_MAC_ADDRESS 0xED, 0xAD, 0xBE, 0xEF, 0xFE, 0xED
+#define MY_MAC_ADDRESS 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED
 
 // Enable inclusion mode
 #define MY_INCLUSION_MODE_FEATURE
@@ -113,8 +113,8 @@
 
 // Flash leds on rx/tx/err
 // Uncomment to override default HW configurations
-#define MY_DEFAULT_ERR_LED_PIN 2  // Error led pin
-#define MY_DEFAULT_RX_LED_PIN  8  // Receive led pin
+#define MY_DEFAULT_ERR_LED_PIN 8  // Error led pin
+#define MY_DEFAULT_RX_LED_PIN  2  // Receive led pin
 #define MY_DEFAULT_TX_LED_PIN  9  // Transmit led pin
 
 #if defined(MY_USE_UDP)
@@ -123,17 +123,38 @@
 #include <Ethernet.h>
 #include <MySensors.h>
 
+#include <Wire.h> 
+#include <LiquidCrystal_I2C.h>
+
+LiquidCrystal_I2C lcd(0x27,20,4);  // set the LCD address to 0x27 for a 16 chars and 2 line display
+
 void setup()
 {
-    // Setup locally attached sensors
+   lcd.init();                      // initialize the lcd 
+  lcd.init();
+  // Print a message to the LCD.
+  lcd.backlight();
+  lcd.setCursor(0,0);
+  lcd.print((String)"Version: " + MYSENSORS_LIBRARY_VERSION);
+  lcd.setCursor(0,1);
+  lcd.print((String)"IP: ");
+  lcd.setCursor(4,1);
+  lcd.print(Ethernet.localIP());
 }
 
 void presentation()
 {
-    // Present locally attached sensors here
+  // Present locally attached sensors here
 }
 
 void loop()
 {
-    // Send locally attached sensors data here
+  lcd.setCursor(0,1);
+  lcd.print((String)"IP: ");
+  lcd.setCursor(4,1);
+  lcd.print(Ethernet.localIP());
+  sleep(1000);
+  lcd.setCursor(0,1);
+  lcd.print("Brabant Water   ");
+  sleep(1000);
 }
