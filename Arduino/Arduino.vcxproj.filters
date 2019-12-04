@@ -17,7 +17,4 @@
   <ItemGroup>
     <None Include="CasaGateway.ino" />
   </ItemGroup>
-  <ItemGroup>
-    <Text Include="Text.txt" />
-  </ItemGroup>
 </Project>
