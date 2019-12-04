@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26228.4
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29509.3
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Libs", "Libs", "{09A986A2-EC14-4132-BFA7-8FC1A66C3AB9}"
 EndProject
@@ -45,7 +45,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gateways.MySensors", "Libs\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Devices.Ping", "Devices\Devices.Ping\Devices.Ping.vcxproj", "{FB585800-9B3F-4CF1-8191-ACF5D5635E6C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebController", "WebController\WebController.csproj", "{8ED8CBBF-F466-4A8F-80CB-356C478A7EBD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebController", "WebController\WebController.csproj", "{8ED8CBBF-F466-4A8F-80CB-356C478A7EBD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Arduino", "Arduino", "{1C4BC33A-8586-4A48-9072-13EB8AFD80A6}"
+	ProjectSection(SolutionItems) = preProject
+		Arduino\CasaGateway.ino = Arduino\CasaGateway.ino
+		Arduino\SensorDistance.ino = Arduino\SensorDistance.ino
+		Arduino\SensorHumidityDHT.ino = Arduino\SensorHumidityDHT.ino
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -358,5 +365,8 @@ Global
 		{564C8900-69C2-4756-AE54-FA254C92D5A6} = {09A986A2-EC14-4132-BFA7-8FC1A66C3AB9}
 		{C323003B-AFA8-464A-B3CA-18F07DD6CDEE} = {09A986A2-EC14-4132-BFA7-8FC1A66C3AB9}
 		{FB585800-9B3F-4CF1-8191-ACF5D5635E6C} = {324B075A-470F-4CA1-B3DF-648F9EBBD037}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {20AD6A37-8E71-484F-A208-206DB18A32E4}
 	EndGlobalSection
 EndGlobal
